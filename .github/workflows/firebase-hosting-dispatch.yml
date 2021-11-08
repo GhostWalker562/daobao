@@ -1,8 +1,8 @@
 name: Deploy to Firebase Hosting
 "on": workflow_dispatch
 jobs:
-  build_and_preview:
-    if: "${{ github.event.pull_request.head.repo.full_name == github.repository }}"
+  build:
+    # if: "${{ github.event.pull_request.head.repo.full_name == github.repository }}"
     runs-on: ubuntu-latest
     steps:
       - uses: subosito/flutter-action@v1
