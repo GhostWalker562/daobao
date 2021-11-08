@@ -48,4 +48,6 @@ class SampleItemListPage extends StatelessWidget {
           ),
         ],
       ),
-    )
+    );
+  }
+}
