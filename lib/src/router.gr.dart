@@ -15,41 +15,60 @@ class _$AppRouter extends RootStackRouter {
 
   @override
   final Map<String, PageFactory> pagesMap = {
-    SampleItemListRoute.name: (routeData) {
-      final args = routeData.argsAs<SampleItemListRouteArgs>(
-          orElse: () => const SampleItemListRouteArgs());
-      return MaterialPageX<dynamic>(
+    HomeWrapperRoute.name: (routeData) {
+      return CustomPage<dynamic>(
           routeData: routeData,
-          child: SampleItemListPage(key: args.key, items: args.items));
+          child: const HomeWrapperPage(),
+          transitionsBuilder: transition,
+          opaque: true,
+          barrierDismissible: false);
+    },
+    HomeRoute.name: (routeData) {
+      return CustomPage<dynamic>(
+          routeData: routeData,
+          child: const HomePage(),
+          transitionsBuilder: transition,
+          opaque: true,
+          barrierDismissible: false);
+    },
+    ProposalsRoute.name: (routeData) {
+      return CustomPage<dynamic>(
+          routeData: routeData,
+          child: const ProposalsPage(),
+          transitionsBuilder: transition,
+          opaque: true,
+          barrierDismissible: false);
     }
   };
 
   @override
-  List<RouteConfig> get routes =>
-      [RouteConfig(SampleItemListRoute.name, path: '/')];
+  List<RouteConfig> get routes => [
+        RouteConfig(HomeWrapperRoute.name, path: '/', children: [
+          RouteConfig(HomeRoute.name, path: '', parent: HomeWrapperRoute.name),
+          RouteConfig(ProposalsRoute.name,
+              path: 'proposals', parent: HomeWrapperRoute.name)
+        ])
+      ];
 }
 
-/// generated route for [SampleItemListPage]
-class SampleItemListRoute extends PageRouteInfo<SampleItemListRouteArgs> {
-  SampleItemListRoute(
-      {Key? key,
-      List<SampleItem> items = const [
-        SampleItem(1),
-        SampleItem(2),
-        SampleItem(3)
-      ]})
-      : super(name,
-            path: '/', args: SampleItemListRouteArgs(key: key, items: items));
+/// generated route for [HomeWrapperPage]
+class HomeWrapperRoute extends PageRouteInfo<void> {
+  const HomeWrapperRoute({List<PageRouteInfo>? children})
+      : super(name, path: '/', initialChildren: children);
 
-  static const String name = 'SampleItemListRoute';
+  static const String name = 'HomeWrapperRoute';
 }
 
-class SampleItemListRouteArgs {
-  const SampleItemListRouteArgs(
-      {this.key,
-      this.items = const [SampleItem(1), SampleItem(2), SampleItem(3)]});
+/// generated route for [HomePage]
+class HomeRoute extends PageRouteInfo<void> {
+  const HomeRoute() : super(name, path: '');
 
-  final Key? key;
+  static const String name = 'HomeRoute';
+}
 
-  final List<SampleItem> items;
+/// generated route for [ProposalsPage]
+class ProposalsRoute extends PageRouteInfo<void> {
+  const ProposalsRoute() : super(name, path: 'proposals');
+
+  static const String name = 'ProposalsRoute';
 }
