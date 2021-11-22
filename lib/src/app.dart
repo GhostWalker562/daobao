@@ -4,10 +4,7 @@ import 'package:daobao/helpers/extensions.dart';
 import 'package:daobao/helpers/helpers.dart';
 import 'package:daobao/src/router.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-// import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-// import 'package:flutter_localizations/flutter_localizations.dart';
 
 /// The Widget that configures your application.
 class MyApp extends StatefulWidget {
@@ -28,9 +25,6 @@ class _MyAppState extends State<MyApp> {
       routerDelegate: _appRouter.delegate(),
       routeInformationParser: _appRouter.defaultRouteParser(),
       restorationScopeId: 'app',
-      // Provide the generated AppLocalizations to the MaterialApp. This
-      // allows descendant Widgets to display the correct translations
-      // depending on the user's locale.
       localizationsDelegates: const [
         // AppLocalizations.delegate,
         // GlobalMaterialLocalizations.delegate,
@@ -52,6 +46,20 @@ class _MyAppState extends State<MyApp> {
         backgroundColor: Styles.paper,
         textTheme: GoogleFonts.nunitoTextTheme(),
         primaryTextTheme: GoogleFonts.interTextTheme(),
+        inputDecorationTheme: InputDecorationTheme(
+          border: OutlineInputBorder(
+            borderRadius: Radii.lr,
+            borderSide: const BorderSide(color: Styles.blue, width: 1),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: Radii.lr,
+            borderSide: const BorderSide(color: Styles.blue, width: 1),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: Radii.lr,
+            borderSide: const BorderSide(color: Styles.blue, width: 1),
+          ),
+        ),
       ),
       darkTheme: ThemeData.dark(),
       themeMode: ThemeMode.light,
@@ -60,54 +68,45 @@ class _MyAppState extends State<MyApp> {
 }
 
 class HomeWrapperPage extends StatelessWidget {
-  const HomeWrapperPage({Key? key}) : super(key: key);
+  HomeWrapperPage({Key? key}) : super(key: key);
+
+  final heroC = HeroController();
 
   @override
   Widget build(BuildContext context) {
     return AutoRouter(
+      navigatorObservers: () => [heroC],
       builder: (context, child) {
         return Scaffold(
           backgroundColor: context.colorScheme.background.withOpacity(0.8),
           body: Column(
             children: [
-              SizedBox(
+              Container(
+                color: context.colorScheme.surface,
                 height: 80,
                 child: Row(
                   children: [
+                    const SizedBox(width: 8),
                     Flexible(
                       child: Container(
-                        padding: EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(12),
                         alignment: Alignment.centerLeft,
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: TransparentButton(
-                            onPressed: () => context.router.pushNamed(''),
-                            child: SvgPicture.asset(
-                              'images/logo/logo.svg',
+                            onPressed: () =>
+                                context.router.root.push(const HomeRoute()),
+                            child: Image.network(
+                              'https://i.imgur.com/YP9h75H.png',
                               width: 36,
                             ),
                           ),
                         ),
                       ),
                     ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        TransparentTextButton(
-                          text: 'Home',
-                          onPressed: () => context.router.pushNamed(''),
-                        ),
-                        const SizedBox(width: 8),
-                        TransparentTextButton(
-                          text: 'Proposals',
-                          onPressed: () =>
-                              context.router.pushNamed('proposals'),
-                        ),
-                        const SizedBox(width: 8),
-                        TransparentTextButton(text: 'About'),
-                      ],
-                    ),
+                    const UnderlinedNavigationBar(),
                     Flexible(child: Container()),
+                    const SizedBox(width: 8),
                   ],
                 ),
               ),
@@ -116,6 +115,62 @@ class HomeWrapperPage extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class UnderlinedNavigationBar extends StatefulWidget {
+  const UnderlinedNavigationBar({Key? key}) : super(key: key);
+
+  @override
+  _UnderlinedNavigationBarState createState() =>
+      _UnderlinedNavigationBarState();
+}
+
+class _UnderlinedNavigationBarState extends State<UnderlinedNavigationBar> {
+  @override
+  Widget build(BuildContext context) {
+    final List<String> segments = context.router.current.path.split('/');
+    final String segment = segments.isNotEmpty ? segments.first : '';
+    const Duration kDefaultDur = Duration(milliseconds: 150);
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        UnderlinedButton(
+          onTap: () => context.router.push(const HomeRoute()),
+          child: AnimatedDefaultTextStyle(
+            style: context.textTheme.headline6!.copyWith(
+                color:
+                    (segment == 'home') ? context.colorScheme.primary : null),
+            duration: kDefaultDur,
+            child: const Text('Home'),
+          ),
+        ),
+        const SizedBox(width: 24),
+        UnderlinedButton(
+          onTap: () => context.router.push(const ProposalHistoryRoute()),
+          child: AnimatedDefaultTextStyle(
+            style: context.textTheme.headline6!.copyWith(
+                color: (segment == 'proposals')
+                    ? context.colorScheme.primary
+                    : null),
+            duration: kDefaultDur,
+            child: const Text('Proposals'),
+          ),
+        ),
+        const SizedBox(width: 24),
+        UnderlinedButton(
+          onTap: () => context.router.push(const AboutRoute()),
+          child: AnimatedDefaultTextStyle(
+            style: context.textTheme.headline6!.copyWith(
+                color:
+                    (segment == 'about') ? context.colorScheme.primary : null),
+            duration: kDefaultDur,
+            child: const Text('About'),
+          ),
+        ),
+      ],
     );
   }
 }

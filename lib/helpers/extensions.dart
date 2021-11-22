@@ -5,5 +5,7 @@ extension ContextExtensions on BuildContext {
   TextTheme get textTheme => theme.textTheme;
   TextTheme get sTextTheme => theme.primaryTextTheme;
   ColorScheme get colorScheme => theme.colorScheme;
+  MediaQueryData get media => MediaQuery.of(this);
+  
 
 }
