@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:daobao/components/transparent_button.dart';
 import 'package:daobao/src/proposals/proposal_components.dart';
 import 'package:daobao/src/router.dart';
@@ -18,8 +19,27 @@ class _ProposalCreatePageState extends State<ProposalCreatePage> {
   final TextEditingController contentController = TextEditingController();
   final TextEditingController titleController = TextEditingController();
   final TextEditingController summaryController = TextEditingController();
+  final TextEditingController backgroundController = TextEditingController();
 
   bool isSettings = false;
+  bool isBackgroundImage = false;
+
+  bool get canSubmit {
+    if (isBackgroundImage) {
+      return backgroundController.text.isNotEmpty &&
+          summaryController.text.isNotEmpty &&
+          titleController.text.isNotEmpty;
+    } else {
+      return contentController.text.isNotEmpty &&
+          summaryController.text.isNotEmpty &&
+          titleController.text.isNotEmpty;
+    }
+  }
+
+  void onSubmit() {
+    if (!canSubmit) return;
+    
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,31 +89,27 @@ class _ProposalCreatePageState extends State<ProposalCreatePage> {
                       isSettings: (e) => setState(() => isSettings = e),
                     ),
                     const SizedBox(height: 24),
-                    AnimatedSize(
-                      curve: Curves.easeOutCubic,
-                      duration: const Duration(milliseconds: 250),
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 250),
-                        child: isSettings
-                            ? Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Image.asset(
-                                    'assets/images/empty_state.png',
-                                    height: 250,
-                                  ),
-                                  const SizedBox(height: 24),
-                                  const Text(
-                                      'This proposal type is not supported.'),
-                                ],
-                              )
-                            : ContentCombEditor(
-                                contentController: contentController,
-                                titleController: titleController,
-                                summaryController: summaryController,
+                    isSettings
+                        ? Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Image.asset(
+                                'assets/images/empty_state.png',
+                                height: 250,
                               ),
-                      ),
-                    ),
+                              const SizedBox(height: 24),
+                              const Text(
+                                  'This proposal type is not supported.'),
+                            ],
+                          )
+                        : ContentCombEditor(
+                            contentController: contentController,
+                            titleController: titleController,
+                            summaryController: summaryController,
+                            backgroundController: backgroundController,
+                            isBackgroundImage: (e) =>
+                                setState(() => isBackgroundImage = e),
+                          ),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -130,17 +146,23 @@ class ContentCombEditor extends StatefulWidget {
     required this.contentController,
     required this.titleController,
     required this.summaryController,
+    required this.backgroundController,
+    this.isBackgroundImage,
   }) : super(key: key);
 
   final TextEditingController contentController;
   final TextEditingController titleController;
   final TextEditingController summaryController;
+  final TextEditingController backgroundController;
+  final ValueChanged<bool>? isBackgroundImage;
 
   @override
   State<ContentCombEditor> createState() => _ContentCombEditorState();
 }
 
 class _ContentCombEditorState extends State<ContentCombEditor> {
+  bool isBackgroundImage = false;
+
   Widget buildMarkdown() {
     Widget current = Center(
       child: Column(
@@ -158,10 +180,29 @@ class _ContentCombEditorState extends State<ContentCombEditor> {
       childMargin: EdgeInsets.zero,
     ).widgets;
 
-    if (widgets != null && widgets.isNotEmpty) {
-      current = SingleChildScrollView(
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start, children: widgets),
+    if (!isBackgroundImage) {
+      if (widgets != null && widgets.isNotEmpty) {
+        current = SingleChildScrollView(
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start, children: widgets),
+        );
+      }
+    } else if (isBackgroundImage &&
+        widget.backgroundController.text.isNotEmpty) {
+      current = Image.network(
+        widget.backgroundController.text,
+        errorBuilder: (context, url, error) {
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Image.asset('assets/images/empty_state.png', height: 200),
+                const SizedBox(height: 24),
+                const Text('Error loading your image'),
+              ],
+            ),
+          );
+        },
       );
     }
 
@@ -170,6 +211,11 @@ class _ContentCombEditorState extends State<ContentCombEditor> {
 
   @override
   Widget build(BuildContext context) {
+    const kDefaultDuration = Duration(milliseconds: 100);
+    const kDefaultLongDuration = Duration(milliseconds: 200);
+    final secondaryVariant = context.colorScheme.secondaryVariant;
+    final onSecondary = context.colorScheme.onSecondary;
+
     return Container(
       constraints: const BoxConstraints(minHeight: 650, maxWidth: 700),
       child: Column(
@@ -187,6 +233,63 @@ class _ContentCombEditorState extends State<ContentCombEditor> {
             ),
             child: buildMarkdown(),
           ),
+          const SizedBox(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TransparentButton(
+                onPressed: () {
+                  isBackgroundImage = false;
+                  widget.isBackgroundImage?.call(isBackgroundImage);
+                  setState(() {});
+                },
+                child: AnimatedContainer(
+                  duration: kDefaultDuration,
+                  decoration: BoxDecoration(
+                    borderRadius: Radii.mr,
+                    color: !isBackgroundImage ? secondaryVariant : null,
+                    border: Border.all(
+                      color: secondaryVariant,
+                      width: 1,
+                    ),
+                  ),
+                  padding: const EdgeInsets.all(8),
+                  child: AnimatedDefaultTextStyle(
+                    duration: kDefaultDuration,
+                    style: context.textTheme.subtitle1!
+                        .copyWith(color: onSecondary),
+                    child: const Text('Markdown'),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              TransparentButton(
+                onPressed: () {
+                  isBackgroundImage = true;
+                  widget.isBackgroundImage?.call(isBackgroundImage);
+                  setState(() {});
+                },
+                child: AnimatedContainer(
+                  duration: kDefaultDuration,
+                  decoration: BoxDecoration(
+                    borderRadius: Radii.mr,
+                    color: isBackgroundImage ? secondaryVariant : null,
+                    border: Border.all(
+                      color: secondaryVariant,
+                      width: 1,
+                    ),
+                  ),
+                  padding: const EdgeInsets.all(8),
+                  child: AnimatedDefaultTextStyle(
+                    duration: kDefaultDuration,
+                    style: context.textTheme.subtitle1!
+                        .copyWith(color: onSecondary),
+                    child: const Text('Background Image'),
+                  ),
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 12),
           const Divider(),
           const SizedBox(height: 12),
@@ -200,25 +303,47 @@ class _ContentCombEditorState extends State<ContentCombEditor> {
             ),
           ),
           const SizedBox(height: 12),
-          Container(
-            decoration: BoxDecoration(
-                color: context.colorScheme.surface.withOpacity(0.5)),
-            child: TextField(
-              controller: widget.contentController,
-              keyboardType: TextInputType.multiline,
-              maxLines: null,
-              minLines: 12,
-              onChanged: (_) => setState(() {}),
-              cursorWidth: 1,
-              decoration: const InputDecoration(
-                hintText: '''
+          AnimatedSwitcher(
+            duration: kDefaultLongDuration,
+            child: AnimatedSize(
+              alignment: Alignment.topCenter,
+              curve: Curves.easeOutExpo,
+              duration: kDefaultLongDuration,
+              child: (!isBackgroundImage)
+                  ? Container(
+                      decoration: BoxDecoration(
+                          color: context.colorScheme.surface.withOpacity(0.5)),
+                      child: TextField(
+                        controller: widget.contentController,
+                        keyboardType: TextInputType.multiline,
+                        maxLines: null,
+                        minLines: 12,
+                        onChanged: (_) => setState(() {}),
+                        cursorWidth: 1,
+                        decoration: const InputDecoration(
+                          hintText: '''
 ## HomepageDAO
 Insert some random content here
 
 You can also add images and videos!
 ![demo](https://xxx)
 ''',
-              ),
+                        ),
+                      ),
+                    )
+                  : Container(
+                      decoration: BoxDecoration(
+                          color: context.colorScheme.surface.withOpacity(0.5)),
+                      child: TextField(
+                        controller: widget.backgroundController,
+                        keyboardType: TextInputType.url,
+                        onChanged: (_) => setState(() {}),
+                        cursorWidth: 1,
+                        decoration: const InputDecoration(
+                          hintText: 'Link to Background Image',
+                        ),
+                      ),
+                    ),
             ),
           ),
           const SizedBox(height: 12),

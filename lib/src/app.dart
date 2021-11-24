@@ -2,9 +2,14 @@ import 'package:auto_route/auto_route.dart';
 import 'package:daobao/components/components.dart';
 import 'package:daobao/helpers/extensions.dart';
 import 'package:daobao/helpers/helpers.dart';
+import 'package:daobao/shared/auth/auth_bloc.dart';
 import 'package:daobao/src/router.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:iconly/iconly.dart';
+
+import 'injectable.dart';
 
 /// The Widget that configures your application.
 class MyApp extends StatefulWidget {
@@ -21,48 +26,54 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      routerDelegate: _appRouter.delegate(),
-      routeInformationParser: _appRouter.defaultRouteParser(),
-      restorationScopeId: 'app',
-      localizationsDelegates: const [
-        // AppLocalizations.delegate,
-        // GlobalMaterialLocalizations.delegate,
-        // GlobalWidgetsLocalizations.delegate,
-        // GlobalCupertinoLocalizations.delegate,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(
+            value: getIt<AuthBloc>()..add(const AuthEvent.checkSupported())),
       ],
-      supportedLocales: const [
-        Locale('en', ''), // English, no country code
-      ],
-      theme: ThemeData(
-        colorScheme: const ColorScheme.light(
-          primary: Styles.blue,
-          primaryVariant: Styles.lightBlue,
-          secondary: Styles.orange,
-          secondaryVariant: Styles.lightYellow,
-          background: Styles.paper,
+      child: MaterialApp.router(
+        routerDelegate: _appRouter.delegate(),
+        routeInformationParser: _appRouter.defaultRouteParser(),
+        restorationScopeId: 'app',
+        localizationsDelegates: const [
+          // AppLocalizations.delegate,
+          // GlobalMaterialLocalizations.delegate,
+          // GlobalWidgetsLocalizations.delegate,
+          // GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('en', ''), // English, no country code
+        ],
+        theme: ThemeData(
+          colorScheme: const ColorScheme.light(
+            primary: Styles.blue,
+            primaryVariant: Styles.lightBlue,
+            secondary: Styles.orange,
+            secondaryVariant: Styles.lightYellow,
+            background: Styles.paper,
+          ),
+          scaffoldBackgroundColor: Styles.paper,
+          backgroundColor: Styles.paper,
+          textTheme: GoogleFonts.nunitoTextTheme(),
+          primaryTextTheme: GoogleFonts.interTextTheme(),
+          inputDecorationTheme: InputDecorationTheme(
+            border: OutlineInputBorder(
+              borderRadius: Radii.lr,
+              borderSide: const BorderSide(color: Styles.blue, width: 1),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: Radii.lr,
+              borderSide: const BorderSide(color: Styles.blue, width: 1),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: Radii.lr,
+              borderSide: const BorderSide(color: Styles.blue, width: 1),
+            ),
+          ),
         ),
-        scaffoldBackgroundColor: Styles.paper,
-        backgroundColor: Styles.paper,
-        textTheme: GoogleFonts.nunitoTextTheme(),
-        primaryTextTheme: GoogleFonts.interTextTheme(),
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(
-            borderRadius: Radii.lr,
-            borderSide: const BorderSide(color: Styles.blue, width: 1),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: Radii.lr,
-            borderSide: const BorderSide(color: Styles.blue, width: 1),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: Radii.lr,
-            borderSide: const BorderSide(color: Styles.blue, width: 1),
-          ),
-        ),
+        darkTheme: ThemeData.dark(),
+        themeMode: ThemeMode.light,
       ),
-      darkTheme: ThemeData.dark(),
-      themeMode: ThemeMode.light,
     );
   }
 }
@@ -90,7 +101,6 @@ class HomeWrapperPage extends StatelessWidget {
                     Flexible(
                       child: Container(
                         padding: const EdgeInsets.all(12),
-                        alignment: Alignment.centerLeft,
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: TransparentButton(
@@ -105,7 +115,55 @@ class HomeWrapperPage extends StatelessWidget {
                       ),
                     ),
                     const UnderlinedNavigationBar(),
-                    Flexible(child: Container()),
+                    Flexible(
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        child: BlocBuilder<AuthBloc, AuthState>(
+                          builder: (context, state) {
+                            return Align(
+                              alignment: Alignment.centerRight,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  TransparentButton(
+                                    onPressed: state is Connected
+                                        ? () => context
+                                            .read<AuthBloc>()
+                                            .add(const Connect())
+                                        : null,
+                                    child: Container(
+                                      padding:
+                                          const EdgeInsets.fromLTRB(12, 8, 12, 8),
+                                      decoration: BoxDecoration(
+                                        color: context.colorScheme.surface,
+                                        border: Border.all(
+                                          width: 1,
+                                          color: context.colorScheme.onSurface,
+                                        ),
+                                        borderRadius: Radii.mr,
+                                      ),
+                                      child: Text(
+                                        (state is Connected)
+                                            ? '${state.address.substring(0, 5)}...${state.address.substring(state.address.length - 4, state.address.length)}'
+                                            : 'Connect',
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  if (state is Connected)
+                                    TransparentButton(
+                                      onPressed: () => context
+                                          .read<AuthBloc>()
+                                          .add(const Disconnect()),
+                                      child: const Icon(IconlyLight.logout),
+                                    ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
                     const SizedBox(width: 8),
                   ],
                 ),
@@ -168,6 +226,17 @@ class _UnderlinedNavigationBarState extends State<UnderlinedNavigationBar> {
                     (segment == 'about') ? context.colorScheme.primary : null),
             duration: kDefaultDur,
             child: const Text('About'),
+          ),
+        ),
+        const SizedBox(width: 24),
+        UnderlinedButton(
+          onTap: () => context.router.push(const StakeRoute()),
+          child: AnimatedDefaultTextStyle(
+            style: context.textTheme.headline6!.copyWith(
+                color:
+                    (segment == 'stake') ? context.colorScheme.primary : null),
+            duration: kDefaultDur,
+            child: const Text('Stake'),
           ),
         ),
       ],

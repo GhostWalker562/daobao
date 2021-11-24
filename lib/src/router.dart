@@ -3,6 +3,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:daobao/src/app.dart';
 import 'package:daobao/src/proposals/proposal_details_page.dart';
 import 'package:daobao/src/proposals/proposal_history_page.dart';
+import 'package:daobao/src/stake/stake_page.dart';
 import 'package:flutter/material.dart';
 
 import 'about/about_page.dart';
@@ -41,6 +42,7 @@ part 'router.gr.dart';
           redirectTo: 'proposals/history',
         ),
         AutoRoute(page: AboutPage, path: 'about'),
+        AutoRoute(page: StakePage, path: 'stake'),
         RedirectRoute(path: '*', redirectTo: 'home'),
       ],
     ),
