@@ -62,14 +62,14 @@ class Web3Service {
       await ContractERC20(tokenAddress, JsonRpcProvider(getAlchemyLink(chain)))
           .balanceOf(owner);
 
-  Future<T> viewDao<T>(String method, [List<String> args = const []]) async =>
+  Future<T> viewDao<T>(String method, [List<dynamic> args = const []]) async =>
       await Contract(
               kDao, Interface(daoAbi), JsonRpcProvider(getAlchemyLink(8001)))
           .call<T>(method, args);
 
   Future<TransactionResponse> sendDao<T>(
     String method, [
-    List<String> args = const [],
+    List<dynamic> args = const [],
     TransactionOverride? override,
   ]) async =>
       await Contract(kDao, Interface(daoAbi), provider!.getSigner())

@@ -30,12 +30,12 @@ part 'router.gr.dart';
           path: 'proposals/history',
         ),
         AutoRoute(
-          page: ProposalsDetailsPage,
-          path: 'proposals/:id',
-        ),
-        AutoRoute(
           page: ProposalCreatePage,
           path: 'proposals/create',
+        ),
+        AutoRoute(
+          page: ProposalsDetailsPage,
+          path: 'proposals/:id',
         ),
         RedirectRoute(
           path: 'proposals/*',

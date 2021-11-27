@@ -12,4 +12,7 @@ class Moralis {
 
   Future<bool> isLoggedIn() async =>
       await promiseToFuture<bool>(moralisJS.isLoggedIn());
+
+  Future<String> upload(String id, dynamic base64) async =>
+      await promiseToFuture<String>(moralisJS.upload(id, base64));
 }

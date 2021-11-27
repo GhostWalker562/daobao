@@ -4,12 +4,17 @@
 // writing unit tests, visit
 // https://flutter.dev/docs/cookbook/testing/unit/introduction
 
-import 'package:flutter_test/flutter_test.dart';
+import 'package:daobao/services/proposals/proposals_service.dart';
 
 void main() {
-  group('Plus Operator', () {
-    test('should add two numbers together', () {
-      expect(1 + 1, 2);
-    });
-  });
+  //  print(Proposal.create('QmNSKewexhgY4rYwPoxPgNFN7BSjeiLXJif9q5FjeCrsmg', ProposalType.addModule));
+  // // group('Plus Operator', () {
+  //   test('should add two numbers together', () {
+  //     expect(1 + 1, 2);
+  //   });
+
+  //   test('print create proposal', () {
+  //     print(Proposal.create('QmNSKewexhgY4rYwPoxPgNFN7BSjeiLXJif9q5FjeCrsmg', ProposalType.addModule));
+  //   });
+  // });
 }

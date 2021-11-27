@@ -7,13 +7,11 @@ import 'package:daobao/shared/auth/auth_bloc.dart';
 import 'package:daobao/shared/auth/auth_guard.dart';
 import 'package:daobao/src/injectable.dart';
 import 'package:daobao/src/proposals/proposal_components.dart';
-import 'package:extended_masked_text/extended_masked_text.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_web3/flutter_web3.dart';
 import 'package:lottie/lottie.dart';
-import 'package:provider/src/provider.dart';
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class StakePage extends StatefulWidget {
   const StakePage({Key? key}) : super(key: key);
@@ -111,7 +109,6 @@ class _StakePageState extends State<StakePage> {
                   const SizedBox(height: 16),
                   if (context.watch<AuthBloc>().state is Connected) ...[
                     FutureBuilder<BigInt>(
-                      // future: Future.delayed(Duration(milliseconds: 100)),
                       future: getIt<Web3Service>().allowance(
                         staking ? kWMATIC : kDaobao,
                         (context.read<AuthBloc>().state as Connected).address,
@@ -121,31 +118,50 @@ class _StakePageState extends State<StakePage> {
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) return const SizedBox.shrink();
                         if (snapshot.data! > BigInt.from(1e18)) {
-                          return TransparentButton(
-                            onPressed: () async {
-                              await (await getIt<Web3Service>()
-                                      .sendDao(staking ? 'stake' : 'withdraw'))
-                                  .wait();
-                              print('refreshing');
-                              context.router.pushNamed('stake');
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: Radii.mr,
-                                border: Border.all(
-                                  color: context.colorScheme.secondary,
-                                  width: 1,
-                                ),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 32, vertical: 8),
-                              child: Text(
-                                staking ? 'Stake' : 'Withdraw',
-                                style: context.textTheme.subtitle1!.copyWith(
-                                  color: context.colorScheme.secondary,
-                                ),
-                              ),
+                          return FutureBuilder<bool>(
+                            future: getIt<Web3Service>().viewDao(
+                              'getMembers',
+                              [
+                                (context.read<AuthBloc>().state as Connected)
+                                    .address
+                              ],
                             ),
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) {
+                                return const CupertinoActivityIndicator();
+                              }
+                              if ((snapshot.data! && !staking) ||
+                                  (!snapshot.data! && staking)) {
+                                return TransparentButton(
+                                  onPressed: () async {
+                                    await (await getIt<Web3Service>().sendDao(
+                                            staking ? 'stake' : 'withdraw'))
+                                        .wait();
+                                    context.router.pushNamed('stake');
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: Radii.mr,
+                                      border: Border.all(
+                                        color: context.colorScheme.secondary,
+                                        width: 1,
+                                      ),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 32, vertical: 8),
+                                    child: Text(
+                                      staking ? 'Stake' : 'Withdraw',
+                                      style:
+                                          context.textTheme.subtitle1!.copyWith(
+                                        color: context.colorScheme.secondary,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                return const SizedBox.shrink();
+                              }
+                            },
                           );
                         }
 

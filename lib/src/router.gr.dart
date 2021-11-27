@@ -44,6 +44,15 @@ class _$AppRouter extends RootStackRouter {
           opaque: true,
           barrierDismissible: false);
     },
+    ProposalCreateRoute.name: (routeData) {
+      return CustomPage<dynamic>(
+          routeData: routeData,
+          child: const ProposalCreatePage(),
+          transitionsBuilder: transition,
+          durationInMilliseconds: 100,
+          opaque: true,
+          barrierDismissible: false);
+    },
     ProposalsDetailsRoute.name: (routeData) {
       final pathParams = routeData.inheritedPathParams;
       final args = routeData.argsAs<ProposalsDetailsRouteArgs>(
@@ -51,15 +60,6 @@ class _$AppRouter extends RootStackRouter {
       return CustomPage<dynamic>(
           routeData: routeData,
           child: ProposalsDetailsPage(key: args.key, id: args.id),
-          transitionsBuilder: transition,
-          durationInMilliseconds: 100,
-          opaque: true,
-          barrierDismissible: false);
-    },
-    ProposalCreateRoute.name: (routeData) {
-      return CustomPage<dynamic>(
-          routeData: routeData,
-          child: const ProposalCreatePage(),
           transitionsBuilder: transition,
           durationInMilliseconds: 100,
           opaque: true,
@@ -97,10 +97,10 @@ class _$AppRouter extends RootStackRouter {
               path: 'home', parent: HomeWrapperRoute.name),
           RouteConfig(ProposalHistoryRoute.name,
               path: 'proposals/history', parent: HomeWrapperRoute.name),
-          RouteConfig(ProposalsDetailsRoute.name,
-              path: 'proposals/:id', parent: HomeWrapperRoute.name),
           RouteConfig(ProposalCreateRoute.name,
               path: 'proposals/create', parent: HomeWrapperRoute.name),
+          RouteConfig(ProposalsDetailsRoute.name,
+              path: 'proposals/:id', parent: HomeWrapperRoute.name),
           RouteConfig('proposals/*#redirect',
               path: 'proposals/*',
               parent: HomeWrapperRoute.name,
@@ -155,6 +155,13 @@ class ProposalHistoryRoute extends PageRouteInfo<void> {
   static const String name = 'ProposalHistoryRoute';
 }
 
+/// generated route for [ProposalCreatePage]
+class ProposalCreateRoute extends PageRouteInfo<void> {
+  const ProposalCreateRoute() : super(name, path: 'proposals/create');
+
+  static const String name = 'ProposalCreateRoute';
+}
+
 /// generated route for [ProposalsDetailsPage]
 class ProposalsDetailsRoute extends PageRouteInfo<ProposalsDetailsRouteArgs> {
   ProposalsDetailsRoute({Key? key, required int id})
@@ -177,13 +184,6 @@ class ProposalsDetailsRouteArgs {
   String toString() {
     return 'ProposalsDetailsRouteArgs{key: $key, id: $id}';
   }
-}
-
-/// generated route for [ProposalCreatePage]
-class ProposalCreateRoute extends PageRouteInfo<void> {
-  const ProposalCreateRoute() : super(name, path: 'proposals/create');
-
-  static const String name = 'ProposalCreateRoute';
 }
 
 /// generated route for [AboutPage]

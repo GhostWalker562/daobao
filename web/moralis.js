@@ -24,3 +24,9 @@ async function logout() {
 async function isLoggedIn() {
   return Moralis.User != null;
 }
+
+async function upload(moduleId, rawJsonBase64) {
+  const file = new Moralis.File(moduleId + ".json", { base64: rawJsonBase64 });
+  await file.saveIPFS();
+  return file.hash();
+}

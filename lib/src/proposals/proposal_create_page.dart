@@ -1,9 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:daobao/components/transparent_button.dart';
+import 'package:daobao/services/proposals/proposals.dart';
+import 'package:daobao/src/proposals/create/create_proposal_bloc.dart';
 import 'package:daobao/src/proposals/proposal_components.dart';
 import 'package:daobao/src/router.dart';
 import 'package:flutter/material.dart';
 import 'package:daobao/helpers/helpers.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:markdown_widget/markdown_widget.dart';
@@ -16,12 +19,14 @@ class ProposalCreatePage extends StatefulWidget {
 }
 
 class _ProposalCreatePageState extends State<ProposalCreatePage> {
+  final CreateProposalBloc bloc = CreateProposalBloc();
+
   final TextEditingController contentController = TextEditingController();
   final TextEditingController titleController = TextEditingController();
   final TextEditingController summaryController = TextEditingController();
   final TextEditingController backgroundController = TextEditingController();
 
-  bool isSettings = false;
+  ProposalType type = ProposalType.addModule;
   bool isBackgroundImage = false;
 
   bool get canSubmit {
@@ -38,100 +43,124 @@ class _ProposalCreatePageState extends State<ProposalCreatePage> {
 
   void onSubmit() {
     if (!canSubmit) return;
-    
+    if (isBackgroundImage) {
+    } else {
+      bloc.add(AddComb(titleController.text, summaryController.text,
+          contentController.text));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: context.colorScheme.background,
-      child: SingleChildScrollView(
-        child: ProposalsContainerWrapper(
-          width: 800,
-          child: Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: context.colorScheme.secondaryVariant.withOpacity(0.25),
-              borderRadius: Radii.lr,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Row(
-                        children: [
-                          const SizedBox(width: 12),
-                          TransparentButton(
-                            onPressed: () => context.router
-                                .push(const ProposalHistoryRoute()),
-                            child: const Icon(IconlyLight.arrow_left),
-                          ),
-                          const Expanded(child: SizedBox()),
-                          Hero(
-                            tag: 'create-proposal',
-                            child: SelectableText(
+    return BlocProvider(
+      create: (context) => bloc,
+      child: Container(
+        color: context.colorScheme.background,
+        child: SingleChildScrollView(
+          child: ProposalsContainerWrapper(
+            width: 800,
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: context.colorScheme.secondaryVariant.withOpacity(0.25),
+                borderRadius: Radii.lr,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Row(
+                          children: [
+                            const SizedBox(width: 12),
+                            TransparentButton(
+                              onPressed: () => context.router
+                                  .push(const ProposalHistoryRoute()),
+                              child: const Icon(IconlyLight.arrow_left),
+                            ),
+                            const Expanded(child: SizedBox()),
+                            Hero(
+                              tag: 'create-proposal',
+                              child: SelectableText(
+                                'Create Proposal',
+                                style: context.textTheme.headline6,
+                              ),
+                            ),
+                            const Expanded(child: SizedBox()),
+                            const InvisibleSized(
+                                child: Icon(IconlyLight.arrow_left)),
+                            const SizedBox(width: 12),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      ProposalTypeSwitch(
+                        isSettings: (e) => setState(() => type = e),
+                      ),
+                      const SizedBox(height: 24),
+                      type != ProposalType.addModule
+                          ? Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Image.asset(
+                                  'assets/images/empty_state.png',
+                                  height: 250,
+                                ),
+                                const SizedBox(height: 24),
+                                const Text(
+                                    'This proposal type is not supported.'),
+                              ],
+                            )
+                          : ContentCombEditor(
+                              contentController: contentController,
+                              titleController: titleController,
+                              summaryController: summaryController,
+                              backgroundController: backgroundController,
+                              isBackgroundImage: (e) =>
+                                  setState(() => isBackgroundImage = e),
+                            ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  BlocConsumer<CreateProposalBloc, CreateProposalState>(
+                    listener: (context, state) {
+                      state.whenOrNull(
+                          success: () =>
+                              context.router.push(const ProposalHistoryRoute()));
+                    },
+                    builder: (context, state) {
+                      return state.maybeWhen(loading: () {
+                        return const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: CircularProgressIndicator(),
+                        );
+                      }, orElse: () {
+                        return TransparentButton(
+                          onPressed:
+                              type != ProposalType.addModule ? null : onSubmit,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: Radii.mr,
+                              color: context.colorScheme.secondary,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            child: Text(
                               'Create Proposal',
-                              style: context.textTheme.headline6,
+                              style: context.textTheme.subtitle1!.copyWith(
+                                color: context.colorScheme.onPrimary,
+                              ),
                             ),
                           ),
-                          const Expanded(child: SizedBox()),
-                          const InvisibleSized(
-                              child: Icon(IconlyLight.arrow_left)),
-                          const SizedBox(width: 12),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    ProposalTypeSwitch(
-                      isSettings: (e) => setState(() => isSettings = e),
-                    ),
-                    const SizedBox(height: 24),
-                    isSettings
-                        ? Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Image.asset(
-                                'assets/images/empty_state.png',
-                                height: 250,
-                              ),
-                              const SizedBox(height: 24),
-                              const Text(
-                                  'This proposal type is not supported.'),
-                            ],
-                          )
-                        : ContentCombEditor(
-                            contentController: contentController,
-                            titleController: titleController,
-                            summaryController: summaryController,
-                            backgroundController: backgroundController,
-                            isBackgroundImage: (e) =>
-                                setState(() => isBackgroundImage = e),
-                          ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                TransparentButton(
-                  onPressed: isSettings ? null : () {},
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: Radii.mr,
-                      color: context.colorScheme.secondary,
-                    ),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Text(
-                      'Create Proposal',
-                      style: context.textTheme.subtitle1!.copyWith(
-                        color: context.colorScheme.onPrimary,
-                      ),
-                    ),
+                        );
+                      });
+                    },
                   ),
-                ),
-                const SizedBox(height: 20),
-              ],
+                  const SizedBox(height: 20),
+                ],
+              ),
             ),
           ),
         ),
@@ -406,33 +435,37 @@ Anything else?
 class ProposalTypeSwitch extends StatefulWidget {
   const ProposalTypeSwitch({Key? key, this.isSettings}) : super(key: key);
 
-  final ValueChanged<bool>? isSettings;
+  final ValueChanged<ProposalType>? isSettings;
 
   @override
   State<ProposalTypeSwitch> createState() => _ProposalTypeSwitchState();
 }
 
 class _ProposalTypeSwitchState extends State<ProposalTypeSwitch> {
-  bool isSettings = false;
+  ProposalType type = ProposalType.addModule;
 
   @override
   Widget build(BuildContext context) {
     const kDefaultDuration = Duration(milliseconds: 100);
+
+    bool isAdd = type == ProposalType.addModule;
+    bool isRemove = type == ProposalType.removeModule;
+    bool isLocktime = type == ProposalType.locktime;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         TransparentButton(
           onPressed: () {
-            isSettings = false;
-            widget.isSettings?.call(isSettings);
+            type = ProposalType.addModule;
+            widget.isSettings?.call(type);
             setState(() {});
           },
           child: AnimatedContainer(
             duration: kDefaultDuration,
             decoration: BoxDecoration(
               borderRadius: Radii.mr,
-              color: !isSettings ? context.colorScheme.primary : null,
+              color: isAdd ? context.colorScheme.primary : null,
               border: Border.all(
                 color: context.colorScheme.primary,
                 width: 1,
@@ -442,26 +475,26 @@ class _ProposalTypeSwitchState extends State<ProposalTypeSwitch> {
             child: AnimatedDefaultTextStyle(
               duration: kDefaultDuration,
               style: context.textTheme.subtitle1!.copyWith(
-                color: !isSettings
+                color: isAdd
                     ? context.colorScheme.onPrimary
                     : context.colorScheme.primary,
               ),
-              child: const Text('Content Comb'),
+              child: const Text('Add Comb'),
             ),
           ),
         ),
         const SizedBox(width: 12),
         TransparentButton(
           onPressed: () {
-            isSettings = true;
-            widget.isSettings?.call(isSettings);
+            type = ProposalType.removeModule;
+            widget.isSettings?.call(type);
             setState(() {});
           },
           child: AnimatedContainer(
             duration: kDefaultDuration,
             decoration: BoxDecoration(
               borderRadius: Radii.mr,
-              color: isSettings ? context.colorScheme.primary : null,
+              color: isRemove ? context.colorScheme.primary : null,
               border: Border.all(
                 color: context.colorScheme.primary,
                 width: 1,
@@ -471,7 +504,36 @@ class _ProposalTypeSwitchState extends State<ProposalTypeSwitch> {
             child: AnimatedDefaultTextStyle(
               duration: kDefaultDuration,
               style: context.textTheme.subtitle1!.copyWith(
-                color: isSettings
+                color: isRemove
+                    ? context.colorScheme.onPrimary
+                    : context.colorScheme.primary,
+              ),
+              child: const Text('Remove Comb'),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        TransparentButton(
+          onPressed: () {
+            type = ProposalType.locktime;
+            widget.isSettings?.call(type);
+            setState(() {});
+          },
+          child: AnimatedContainer(
+            duration: kDefaultDuration,
+            decoration: BoxDecoration(
+              borderRadius: Radii.mr,
+              color: isLocktime ? context.colorScheme.primary : null,
+              border: Border.all(
+                color: context.colorScheme.primary,
+                width: 1,
+              ),
+            ),
+            padding: const EdgeInsets.all(8),
+            child: AnimatedDefaultTextStyle(
+              duration: kDefaultDuration,
+              style: context.textTheme.subtitle1!.copyWith(
+                color: isLocktime
                     ? context.colorScheme.onPrimary
                     : context.colorScheme.primary,
               ),
