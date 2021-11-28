@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:daobao/helpers/extensions.dart';
+import 'package:daobao/src/home/home_page.dart';
 import 'package:flutter/material.dart';
 
 class AboutPage extends StatelessWidget {
@@ -16,6 +17,7 @@ class AboutPage extends StatelessWidget {
       child: SingleChildScrollView(
         child: Column(
           children: [
+            const DefaultHomePage(),
             Container(
               height: screenHeight - 70,
               color: context.colorScheme.primary,
@@ -213,6 +215,45 @@ Daobao is a step towards creating a community that can enjoy the decision making
                     ),
                   ),
                 ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class DefaultHomePage extends StatelessWidget {
+  const DefaultHomePage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: context.media.size.height,
+      decoration: BoxDecoration(
+        color: context.colorScheme.background,
+        image: const DecorationImage(
+          fit: BoxFit.cover,
+          alignment: Alignment.bottomCenter,
+          image: NetworkImage('https://i.imgur.com/wvqpL0q.png'),
+        ),
+      ),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.network(
+              'https://i.imgur.com/Pp2bKbL.png',
+              height: 200,
+            ),
+            const SizedBox(height: 32),
+            SelectableText(
+              'The first community run homepage',
+              style: context.sTextTheme.headline3!.copyWith(
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.italic,
+                color: context.colorScheme.primary,
               ),
             ),
           ],

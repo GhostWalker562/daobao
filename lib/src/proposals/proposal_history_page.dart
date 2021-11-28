@@ -55,8 +55,9 @@ class ProposalHistoryPage extends StatelessWidget {
                       'daobao tokens represent voting shares in the HomepageDAO governance. You can vote on each proposal yourself or create proposals yourself.',
                     ),
                     const SizedBox(height: 8),
-                    const TransparentButton(
-                      child: Text(
+                    TransparentButton(
+                      onPressed: () => context.router.push(const StakeRoute()),
+                      child: const Text(
                         'Get some tokens yourself',
                         style: TextStyle(
                           decoration: TextDecoration.underline,
@@ -91,13 +92,6 @@ class ProposalHistoryPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              // TextButton(
-              //   child: Text('Tuple'),
-              //   onPressed: () async {
-              //     print(await getIt<Web3Service>()
-              //         .viewDao('getProposalInfo', ['0']));
-              //   },
-              // ),
               Expanded(
                 child: BlocProvider(
                   create: (context) => HistoryCubit()..load(),
@@ -107,24 +101,29 @@ class ProposalHistoryPage extends StatelessWidget {
                         data: (live, history) => Column(
                           children: [
                             if (live.isEmpty && history.isEmpty)
-                              Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: context.colorScheme.secondary,
+                              Expanded(
+                                child: SingleChildScrollView(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: context.colorScheme.secondary,
+                                      ),
+                                      borderRadius: Radii.lr,
+                                    ),
+                                    margin: const EdgeInsets.all(64.0),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 64, vertical: 32.0),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Image.asset(
+                                            'assets/images/empty_state.png',
+                                            height: 200),
+                                        const SizedBox(height: 24),
+                                        const Text('No proposals yet.'),
+                                      ],
+                                    ),
                                   ),
-                                  borderRadius: Radii.lr,
-                                ),
-                                margin: const EdgeInsets.all(64.0),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 64, vertical: 32.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Image.asset('assets/images/empty_state.png',
-                                        height: 200),
-                                    const SizedBox(height: 24),
-                                    const Text('No proposals yet.'),
-                                  ],
                                 ),
                               ),
                             ...live.map((e) => Padding(
@@ -132,20 +131,22 @@ class ProposalHistoryPage extends StatelessWidget {
                                       const EdgeInsets.symmetric(vertical: 8.0),
                                   child: ProposalButton(proposal: e),
                                 )),
-                            Expanded(
-                              child: ListView.builder(
-                                itemCount: history.length,
-                                itemBuilder: (context, index) {
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 8.0),
-                                    child: ProposalButton(
-                                      proposal: history[index],
-                                    ),
-                                  );
-                                },
+                            if (history.isNotEmpty)
+                              Expanded(
+                                child: ListView.builder(
+                                  itemCount: history.length,
+                                  itemBuilder: (context, index) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 8.0),
+                                      child: ProposalButton(
+                                        proposal:
+                                            history.reversed.toList()[index],
+                                      ),
+                                    );
+                                  },
+                                ),
                               ),
-                            ),
                           ],
                         ),
                         orElse: () => Center(
@@ -249,6 +250,15 @@ class ProposalButton extends StatefulWidget {
 class _ProposalButtonState extends State<ProposalButton> {
   bool isHovered = false;
 
+  bool get deciding =>
+      widget.proposal.end < currentTimeInSeconds &&
+      widget.proposal.status == ProposalStatus.inProgress;
+
+  static int get currentTimeInSeconds {
+    var ms = (DateTime.now()).millisecondsSinceEpoch;
+    return (ms / 1000).round();
+  }
+
   Widget _buildType() {
     if (widget.proposal is! ProposalData) return const SizedBox.shrink();
 
@@ -327,12 +337,25 @@ class _ProposalButtonState extends State<ProposalButton> {
     );
   }
 
+  void decide() async {
+    try {
+      final tx = await getIt<Web3Service>()
+          .sendDao('decideProposal', [widget.proposal.id]);
+      await tx.wait();
+      context.read<HistoryCubit>().load();
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
       child: GestureDetector(
-        onTap: () => context.router
-            .push(ProposalsDetailsRoute(id: int.parse(widget.proposal.id))),
+        onTap: () async {
+          context.router
+              .push(ProposalsDetailsRoute(id: int.parse(widget.proposal.id)));
+        },
         child: MouseRegion(
           cursor: SystemMouseCursors.click,
           onEnter: (_) => setState(() => isHovered = true),
@@ -356,31 +379,49 @@ class _ProposalButtonState extends State<ProposalButton> {
                 _buildType(),
                 const SizedBox(width: 8),
                 FutureBuilder<Response<Map<String, dynamic>>>(
-                    future: Dio().get<Map<String, dynamic>>(
-                        'https://ipfs.moralis.io:2053/ipfs/${widget.proposal.cid}'),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) {
-                        return Text(
-                          'Error',
-                          style: context.textTheme.headline6!.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        );
-                      }
-                      if (!snapshot.hasData) {
-                        return const CircularProgressIndicator();
-                      }
-
-                      final data = ModuleData.fromJson(snapshot.data!.data!);
-
+                  future: Dio().get<Map<String, dynamic>>(
+                      'https://ipfs.moralis.io:2053/ipfs/${widget.proposal.cid}'),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
                       return Text(
-                        data.title,
+                        'Error',
                         style: context.textTheme.headline6!.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
                       );
-                    }),
+                    }
+                    if (!snapshot.hasData) {
+                      return const CircularProgressIndicator();
+                    }
+
+                    final data = ModuleData.fromJson(snapshot.data!.data!);
+
+                    return Text(
+                      data.title,
+                      style: context.textTheme.headline6!.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    );
+                  },
+                ),
                 Expanded(child: Container()),
+                if (deciding)
+                  TransparentButton(
+                    onPressed: decide,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: context.colorScheme.primary,
+                        borderRadius: Radii.mr,
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 8),
+                      margin: const EdgeInsets.only(right: 12),
+                      child: Text(
+                        'DECIDE',
+                        style: TextStyle(color: context.colorScheme.onPrimary),
+                      ),
+                    ),
+                  ),
                 _buildStatus(),
               ],
             ),

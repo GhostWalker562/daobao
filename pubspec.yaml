@@ -41,6 +41,9 @@ dependencies:
   cached_network_image: ^3.1.0+1
   lottie: ^1.2.1
   uuid: ^3.0.5
+  shared_preferences: ^2.0.9
+  flutter_dotenv: ^5.0.2
+  url_launcher: ^6.0.15
 
 dev_dependencies:
   build_runner:
@@ -63,3 +66,4 @@ flutter:
     # Add assets from the images directory to the application.
     - assets/images/
     - assets/images/logo/
+    - .env

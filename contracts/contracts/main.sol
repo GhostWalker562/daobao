@@ -18,9 +18,8 @@ contract backend is Ownable, VRFConsumerBase {
 
     enum Indicator {Threshold, Quorum, Locktime, ModuleAdded, ModuleRemoved}
     enum Status {Passed, Failed, InProgress, Removed}
-
-    // Default to WMATIC
-    ERC20 BOND = ERC20(0x86652c1301843B4E06fBfbBDaA6849266fb2b5e7);
+    
+    ERC20 public WMATIC;
 
     /**
     WMATIC MAINNET: 0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270
@@ -35,7 +34,7 @@ contract backend is Ownable, VRFConsumerBase {
     uint randomResult;
     uint fee; 
     bytes32 keyHash;
-    DaobaoToken minting;
+    Token minting;
     string mediateRandomness; // id of Proposal that is being decided.
     uint mediateTimestamp; // block.timestamp at decision when randomness is called.
     bool winnerChosen;
@@ -67,17 +66,15 @@ contract backend is Ownable, VRFConsumerBase {
     event ModuleRemoved(string id);
     event Winner(address thewinner);
 
-    constructor(uint _threshold, uint _locktime, uint _quorum, address _bond ) VRFConsumerBase(0x8C7382F9D8f56b33781fE506E897a4F1e2d17255, 
+    constructor(uint _threshold, uint _locktime, uint _quorum) VRFConsumerBase(0x8C7382F9D8f56b33781fE506E897a4F1e2d17255, 
         0x326C977E6efc84E512bB9C30f76E30c160eD06FB) {
         threshold = _threshold * (10 ** 18); 
         locktime = _locktime;
         quorum = _quorum / 100;
         keyHash = 0x6e75b569a01ef56d18cab6a8e71e6600d6ce853834d4a5748b720d06f878b3a4;
         fee = 0.0001 * 10 ** 18; // 0.0001 LINK
-        minting = new DaobaoToken();
-        BOND = ERC20(_bond);
+        WMATIC = ERC20(0x86652c1301843B4E06fBfbBDaA6849266fb2b5e7);
     }
-
         /**
     MUMBAI TESTNET
     LINK Token	0x326C977E6efc84E512bB9C30f76E30c160eD06FB
@@ -101,13 +98,13 @@ contract backend is Ownable, VRFConsumerBase {
         _;
     }
 
-    function mintingContract(DaobaoToken _minting) external onlyOwner {
+    function mintingContract(Token _minting) external onlyOwner {
         minting = _minting;
     }
-
-    function stake() payable public {
+    
+    function stake() external {
         require(Members[msg.sender] == false, 'already staked');
-        require(BOND.transferFrom(msg.sender, address(this), threshold), 'transfer required');
+        require(WMATIC.transferFrom(msg.sender, address(this), threshold), "transfer required"); // approval must be done first
         AmountStaked[msg.sender] = threshold;
         Members[msg.sender] = true;
         minting.mintRequest(msg.sender);
@@ -119,7 +116,7 @@ contract backend is Ownable, VRFConsumerBase {
         Members[msg.sender] = false;
         uint transfervalue = AmountStaked[msg.sender];
         AmountStaked[msg.sender] = 0;
-        BOND.transfer(msg.sender, transfervalue);
+        WMATIC.transfer(msg.sender, transfervalue);
     }
 
     function removeIndex(string[] storage arrayname, uint index) internal {
@@ -197,7 +194,7 @@ contract backend is Ownable, VRFConsumerBase {
         uint totalvotes = ProposalInfo[id].totalvotes * 100;
         uint overcome = (totalvotes / 50) * (ProposalInfo[id].quorumsnapshot / 2);
         if (forvotes > overcome) {
-            ProposalInfo[id].status == Status.Passed;
+            ProposalInfo[id].status = Status.Passed;
             settleProposal(id);
             History.push(id);
             emit ProposalAccepted(id);
@@ -206,7 +203,7 @@ contract backend is Ownable, VRFConsumerBase {
             mediateTimestamp = block.timestamp;
             winnerChosen = false;
         } else {
-            ProposalInfo[id].status == Status.Failed;
+            ProposalInfo[id].status = Status.Failed;
             emit ProposalRejected(id);
             History.push(id);
         }
@@ -300,5 +297,5 @@ contract backend is Ownable, VRFConsumerBase {
 
     function UIDtoProposalName(uint num) external view returns (string memory) {
         return UID[num];
-    }
+    }   
 }

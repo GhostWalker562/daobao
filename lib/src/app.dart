@@ -239,6 +239,17 @@ class _UnderlinedNavigationBarState extends State<UnderlinedNavigationBar> {
             child: const Text('Stake'),
           ),
         ),
+        const SizedBox(width: 24),
+        UnderlinedButton(
+          onTap: () => context.router.push(const WinnerRoute()),
+          child: AnimatedDefaultTextStyle(
+            style: context.textTheme.headline6!.copyWith(
+                color:
+                    (segment == 'winner') ? context.colorScheme.primary : null),
+            duration: kDefaultDur,
+            child: const Text('Winner'),
+          ),
+        ),
       ],
     );
   }

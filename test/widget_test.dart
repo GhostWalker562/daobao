@@ -8,9 +8,6 @@
 // Visit https://flutter.dev/docs/cookbook/testing/widget/introduction for
 // more information about Widget testing.
 
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-
 void main() {
   // group('MyWidget', () {
   //   testWidgets('should display a string of text', (WidgetTester tester) async {

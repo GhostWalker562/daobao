@@ -82,6 +82,15 @@ class _$AppRouter extends RootStackRouter {
           durationInMilliseconds: 100,
           opaque: true,
           barrierDismissible: false);
+    },
+    WinnerRoute.name: (routeData) {
+      return CustomPage<dynamic>(
+          routeData: routeData,
+          child: const WinnerPage(),
+          transitionsBuilder: transition,
+          durationInMilliseconds: 100,
+          opaque: true,
+          barrierDismissible: false);
     }
   };
 
@@ -110,6 +119,8 @@ class _$AppRouter extends RootStackRouter {
               path: 'about', parent: HomeWrapperRoute.name),
           RouteConfig(StakeRoute.name,
               path: 'stake', parent: HomeWrapperRoute.name),
+          RouteConfig(WinnerRoute.name,
+              path: 'winner', parent: HomeWrapperRoute.name),
           RouteConfig('*#redirect',
               path: '*',
               parent: HomeWrapperRoute.name,
@@ -198,4 +209,11 @@ class StakeRoute extends PageRouteInfo<void> {
   const StakeRoute() : super(name, path: 'stake');
 
   static const String name = 'StakeRoute';
+}
+
+/// generated route for [WinnerPage]
+class WinnerRoute extends PageRouteInfo<void> {
+  const WinnerRoute() : super(name, path: 'winner');
+
+  static const String name = 'WinnerRoute';
 }

@@ -4,8 +4,6 @@
 // writing unit tests, visit
 // https://flutter.dev/docs/cookbook/testing/unit/introduction
 
-import 'package:daobao/services/proposals/proposals_service.dart';
-
 void main() {
   //  print(Proposal.create('QmNSKewexhgY4rYwPoxPgNFN7BSjeiLXJif9q5FjeCrsmg', ProposalType.addModule));
   // // group('Plus Operator', () {

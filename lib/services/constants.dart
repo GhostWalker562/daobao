@@ -3,8 +3,8 @@ const String kMumbaiAlchemy =
 
 const List<int> supportedChains = [80001];
 
-const String kDao = '0xc618154036D2cEe85b7BBfb12925b7D95207fBa7';
-const String kDaobao = '0xAa7596858Be5Ac5a86B71866e224c20F5A2dc2B3';
+const String kDao = '0x49F371DaB13414437A31388430DC47fcE9C56dfc';
+const String kDaobao = '0x6486aE4a9aBD4c3f638569212c0D1E1899Cebc8D';
 const String kWMATIC = '0x86652c1301843B4E06fBfbBDaA6849266fb2b5e7';
 
 String getAlchemyLink(int chainId) {
@@ -25,5 +25,10 @@ const daoAbi = [
   "function getProposalsHistory() view returns(string[])",
   "function getActiveProposals() external view returns(string[])",
   "function getProposalInfo(string str) view returns(tuple(string,uint,uint8,uint,address[],uint8,uint,uint,uint))",
-  'function getMembers(address addy) view returns(bool) '
+  'function getMembers(address addy) view returns(bool) ',
+  'function getVoted(address addy, string str) view returns(bool)',
+  'function decideProposal(string id)',
+  'function mediateRandomness() view returns (string)',
+  'function currentWinner() view returns (address)',
+  'function decideWinner()',
 ];

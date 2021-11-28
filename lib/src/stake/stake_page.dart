@@ -73,7 +73,7 @@ class _StakePageState extends State<StakePage> {
                                     children: [
                                       Expanded(
                                         child: Lottie.network(
-                                            'https://assets8.lottiefiles.com/temp/lf20_zBfmHv.json'),
+                                            'https://assets4.lottiefiles.com/packages/lf20_yc9ywdm7.json'),
                                       ),
                                       Text(
                                         'You are a member!',
