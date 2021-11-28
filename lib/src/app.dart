@@ -126,7 +126,7 @@ class HomeWrapperPage extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   TransparentButton(
-                                    onPressed: state is Connected
+                                    onPressed: state is! Connected
                                         ? () => context
                                             .read<AuthBloc>()
                                             .add(const Connect())
