@@ -8,6 +8,7 @@ import 'package:daobao/services/web3/web3.dart';
 import 'package:daobao/src/proposals/cubit/history_cubit.dart';
 import 'package:daobao/src/router.dart';
 import 'package:dio/dio.dart';
+import 'package:fl_toast/fl_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web3/flutter_web3.dart';
@@ -345,6 +346,7 @@ class _ProposalButtonState extends State<ProposalButton> {
       context.read<HistoryCubit>().load();
     } catch (e) {
       print(e);
+      showTextToast(text: e.toString(), context: context);
     }
   }
 
@@ -353,8 +355,7 @@ class _ProposalButtonState extends State<ProposalButton> {
     return Center(
       child: GestureDetector(
         onTap: () async {
-          context.router
-              .push(ProposalsDetailsRoute(id: int.parse(widget.proposal.id)));
+          context.router.push(ProposalsDetailsRoute(id: widget.proposal.id));
         },
         child: MouseRegion(
           cursor: SystemMouseCursors.click,

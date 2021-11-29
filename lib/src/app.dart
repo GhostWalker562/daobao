@@ -2,10 +2,13 @@ import 'package:auto_route/auto_route.dart';
 import 'package:daobao/components/components.dart';
 import 'package:daobao/helpers/extensions.dart';
 import 'package:daobao/helpers/helpers.dart';
+import 'package:daobao/services/constants.dart';
 import 'package:daobao/shared/auth/auth_bloc.dart';
 import 'package:daobao/src/router.dart';
+import 'package:fl_toast/fl_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_web3/flutter_web3.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconly/iconly.dart';
 
@@ -41,6 +44,7 @@ class _MyAppState extends State<MyApp> {
           // GlobalWidgetsLocalizations.delegate,
           // GlobalCupertinoLocalizations.delegate,
         ],
+        builder: (context, widget) => ToastProvider(child: widget),
         supportedLocales: const [
           Locale('en', ''), // English, no country code
         ],
@@ -83,6 +87,19 @@ class HomeWrapperPage extends StatelessWidget {
 
   final heroC = HeroController();
 
+  Future<void> switchToMumbai() async {
+    await ethereum!.walletSwitchChain(80001, () async {
+      await ethereum!.walletAddChain(
+        chainId: 80001,
+        chainName: 'Mumbai',
+        nativeCurrency:
+            CurrencyParams(name: 'Matic', symbol: 'MATIC', decimals: 18),
+        rpcUrls: ['https://matic-mumbai.chainstacklabs.com'],
+        blockExplorerUrls: ['https://polygonscan.com/'],
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return AutoRouter(
@@ -120,6 +137,11 @@ class HomeWrapperPage extends StatelessWidget {
                         padding: const EdgeInsets.all(12),
                         child: BlocBuilder<AuthBloc, AuthState>(
                           builder: (context, state) {
+                            bool isConnected = state is Connected;
+                            bool wrongChain = (isConnected)
+                                ? !supportedChains.contains(state.chainId)
+                                : true;
+
                             return Align(
                               alignment: Alignment.centerRight,
                               child: Row(
@@ -130,12 +152,17 @@ class HomeWrapperPage extends StatelessWidget {
                                         ? () => context
                                             .read<AuthBloc>()
                                             .add(const Connect())
-                                        : null,
+                                        : wrongChain
+                                            ? switchToMumbai
+                                            : null,
                                     child: Container(
-                                      padding:
-                                          const EdgeInsets.fromLTRB(12, 8, 12, 8),
+                                      padding: const EdgeInsets.fromLTRB(
+                                          12, 8, 12, 8),
                                       decoration: BoxDecoration(
-                                        color: context.colorScheme.surface,
+                                        color: !isConnected ||
+                                                (isConnected && !wrongChain)
+                                            ? context.colorScheme.surface
+                                            : context.colorScheme.secondary,
                                         border: Border.all(
                                           width: 1,
                                           color: context.colorScheme.onSurface,
@@ -143,9 +170,11 @@ class HomeWrapperPage extends StatelessWidget {
                                         borderRadius: Radii.mr,
                                       ),
                                       child: Text(
-                                        (state is Connected)
+                                        (isConnected && !wrongChain)
                                             ? '${state.address.substring(0, 5)}...${state.address.substring(state.address.length - 4, state.address.length)}'
-                                            : 'Connect',
+                                            : isConnected
+                                                ? 'Wrong Network'
+                                                : 'Connect',
                                       ),
                                     ),
                                   ),

@@ -127,12 +127,18 @@ class __$IdleCopyWithImpl<$Res> extends _$SendNftStateCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_Idle implements _Idle {
+class _$_Idle with DiagnosticableTreeMixin implements _Idle {
   const _$_Idle();
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'SendNftState.idle()';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties..add(DiagnosticsProperty('type', 'SendNftState.idle'));
   }
 
   @override
@@ -241,12 +247,18 @@ class __$LoadingCopyWithImpl<$Res> extends _$SendNftStateCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_Loading implements _Loading {
+class _$_Loading with DiagnosticableTreeMixin implements _Loading {
   const _$_Loading();
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'SendNftState.loading()';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties..add(DiagnosticsProperty('type', 'SendNftState.loading'));
   }
 
   @override
@@ -368,15 +380,23 @@ class __$SuccessCopyWithImpl<$Res> extends _$SendNftStateCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_Success implements _Success {
+class _$_Success with DiagnosticableTreeMixin implements _Success {
   const _$_Success(this.hash);
 
   @override
   final String hash;
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'SendNftState.success(hash: $hash)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'SendNftState.success'))
+      ..add(DiagnosticsProperty('hash', hash));
   }
 
   @override
@@ -497,12 +517,18 @@ class __$ErrorCopyWithImpl<$Res> extends _$SendNftStateCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_Error implements _Error {
+class _$_Error with DiagnosticableTreeMixin implements _Error {
   const _$_Error();
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'SendNftState.error()';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties..add(DiagnosticsProperty('type', 'SendNftState.error'));
   }
 
   @override

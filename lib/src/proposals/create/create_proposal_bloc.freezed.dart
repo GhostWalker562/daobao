@@ -467,8 +467,10 @@ class _$CreateProposalStateTearOff {
     return const _Success();
   }
 
-  _Error error() {
-    return const _Error();
+  _Error error(dynamic e) {
+    return _Error(
+      e,
+    );
   }
 }
 
@@ -482,7 +484,7 @@ mixin _$CreateProposalState {
     required TResult Function() unloaded,
     required TResult Function() loading,
     required TResult Function() success,
-    required TResult Function() error,
+    required TResult Function(dynamic e) error,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -490,7 +492,7 @@ mixin _$CreateProposalState {
     TResult Function()? unloaded,
     TResult Function()? loading,
     TResult Function()? success,
-    TResult Function()? error,
+    TResult Function(dynamic e)? error,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -498,7 +500,7 @@ mixin _$CreateProposalState {
     TResult Function()? unloaded,
     TResult Function()? loading,
     TResult Function()? success,
-    TResult Function()? error,
+    TResult Function(dynamic e)? error,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -588,7 +590,7 @@ class _$_Unloaded implements _Unloaded {
     required TResult Function() unloaded,
     required TResult Function() loading,
     required TResult Function() success,
-    required TResult Function() error,
+    required TResult Function(dynamic e) error,
   }) {
     return unloaded();
   }
@@ -599,7 +601,7 @@ class _$_Unloaded implements _Unloaded {
     TResult Function()? unloaded,
     TResult Function()? loading,
     TResult Function()? success,
-    TResult Function()? error,
+    TResult Function(dynamic e)? error,
   }) {
     return unloaded?.call();
   }
@@ -610,7 +612,7 @@ class _$_Unloaded implements _Unloaded {
     TResult Function()? unloaded,
     TResult Function()? loading,
     TResult Function()? success,
-    TResult Function()? error,
+    TResult Function(dynamic e)? error,
     required TResult orElse(),
   }) {
     if (unloaded != null) {
@@ -703,7 +705,7 @@ class _$_Loading implements _Loading {
     required TResult Function() unloaded,
     required TResult Function() loading,
     required TResult Function() success,
-    required TResult Function() error,
+    required TResult Function(dynamic e) error,
   }) {
     return loading();
   }
@@ -714,7 +716,7 @@ class _$_Loading implements _Loading {
     TResult Function()? unloaded,
     TResult Function()? loading,
     TResult Function()? success,
-    TResult Function()? error,
+    TResult Function(dynamic e)? error,
   }) {
     return loading?.call();
   }
@@ -725,7 +727,7 @@ class _$_Loading implements _Loading {
     TResult Function()? unloaded,
     TResult Function()? loading,
     TResult Function()? success,
-    TResult Function()? error,
+    TResult Function(dynamic e)? error,
     required TResult orElse(),
   }) {
     if (loading != null) {
@@ -818,7 +820,7 @@ class _$_Success implements _Success {
     required TResult Function() unloaded,
     required TResult Function() loading,
     required TResult Function() success,
-    required TResult Function() error,
+    required TResult Function(dynamic e) error,
   }) {
     return success();
   }
@@ -829,7 +831,7 @@ class _$_Success implements _Success {
     TResult Function()? unloaded,
     TResult Function()? loading,
     TResult Function()? success,
-    TResult Function()? error,
+    TResult Function(dynamic e)? error,
   }) {
     return success?.call();
   }
@@ -840,7 +842,7 @@ class _$_Success implements _Success {
     TResult Function()? unloaded,
     TResult Function()? loading,
     TResult Function()? success,
-    TResult Function()? error,
+    TResult Function(dynamic e)? error,
     required TResult orElse(),
   }) {
     if (success != null) {
@@ -895,6 +897,7 @@ abstract class _Success implements CreateProposalState {
 abstract class _$ErrorCopyWith<$Res> {
   factory _$ErrorCopyWith(_Error value, $Res Function(_Error) then) =
       __$ErrorCopyWithImpl<$Res>;
+  $Res call({dynamic e});
 }
 
 /// @nodoc
@@ -905,26 +908,49 @@ class __$ErrorCopyWithImpl<$Res> extends _$CreateProposalStateCopyWithImpl<$Res>
 
   @override
   _Error get _value => super._value as _Error;
+
+  @override
+  $Res call({
+    Object? e = freezed,
+  }) {
+    return _then(_Error(
+      e == freezed
+          ? _value.e
+          : e // ignore: cast_nullable_to_non_nullable
+              as dynamic,
+    ));
+  }
 }
 
 /// @nodoc
 
 class _$_Error implements _Error {
-  const _$_Error();
+  const _$_Error(this.e);
+
+  @override
+  final dynamic e;
 
   @override
   String toString() {
-    return 'CreateProposalState.error()';
+    return 'CreateProposalState.error(e: $e)';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is _Error);
+        (other.runtimeType == runtimeType &&
+            other is _Error &&
+            const DeepCollectionEquality().equals(other.e, e));
   }
 
   @override
-  int get hashCode => runtimeType.hashCode;
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(e));
+
+  @JsonKey(ignore: true)
+  @override
+  _$ErrorCopyWith<_Error> get copyWith =>
+      __$ErrorCopyWithImpl<_Error>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -932,9 +958,9 @@ class _$_Error implements _Error {
     required TResult Function() unloaded,
     required TResult Function() loading,
     required TResult Function() success,
-    required TResult Function() error,
+    required TResult Function(dynamic e) error,
   }) {
-    return error();
+    return error(e);
   }
 
   @override
@@ -943,9 +969,9 @@ class _$_Error implements _Error {
     TResult Function()? unloaded,
     TResult Function()? loading,
     TResult Function()? success,
-    TResult Function()? error,
+    TResult Function(dynamic e)? error,
   }) {
-    return error?.call();
+    return error?.call(e);
   }
 
   @override
@@ -954,11 +980,11 @@ class _$_Error implements _Error {
     TResult Function()? unloaded,
     TResult Function()? loading,
     TResult Function()? success,
-    TResult Function()? error,
+    TResult Function(dynamic e)? error,
     required TResult orElse(),
   }) {
     if (error != null) {
-      return error();
+      return error(e);
     }
     return orElse();
   }
@@ -1002,5 +1028,9 @@ class _$_Error implements _Error {
 }
 
 abstract class _Error implements CreateProposalState {
-  const factory _Error() = _$_Error;
+  const factory _Error(dynamic e) = _$_Error;
+
+  dynamic get e;
+  @JsonKey(ignore: true)
+  _$ErrorCopyWith<_Error> get copyWith => throw _privateConstructorUsedError;
 }

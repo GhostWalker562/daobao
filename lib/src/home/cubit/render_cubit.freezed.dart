@@ -21,7 +21,7 @@ class _$RenderStateTearOff {
     return const _Loading();
   }
 
-  _Render render(List<Module> data) {
+  _Render render(List<ModuleProposalLink> data) {
     return _Render(
       data,
     );
@@ -40,21 +40,21 @@ mixin _$RenderState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
-    required TResult Function(List<Module> data) render,
+    required TResult Function(List<ModuleProposalLink> data) render,
     required TResult Function() error,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? loading,
-    TResult Function(List<Module> data)? render,
+    TResult Function(List<ModuleProposalLink> data)? render,
     TResult Function()? error,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
-    TResult Function(List<Module> data)? render,
+    TResult Function(List<ModuleProposalLink> data)? render,
     TResult Function()? error,
     required TResult orElse(),
   }) =>
@@ -138,7 +138,7 @@ class _$_Loading implements _Loading {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
-    required TResult Function(List<Module> data) render,
+    required TResult Function(List<ModuleProposalLink> data) render,
     required TResult Function() error,
   }) {
     return loading();
@@ -148,7 +148,7 @@ class _$_Loading implements _Loading {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? loading,
-    TResult Function(List<Module> data)? render,
+    TResult Function(List<ModuleProposalLink> data)? render,
     TResult Function()? error,
   }) {
     return loading?.call();
@@ -158,7 +158,7 @@ class _$_Loading implements _Loading {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
-    TResult Function(List<Module> data)? render,
+    TResult Function(List<ModuleProposalLink> data)? render,
     TResult Function()? error,
     required TResult orElse(),
   }) {
@@ -211,7 +211,7 @@ abstract class _Loading implements RenderState {
 abstract class _$RenderCopyWith<$Res> {
   factory _$RenderCopyWith(_Render value, $Res Function(_Render) then) =
       __$RenderCopyWithImpl<$Res>;
-  $Res call({List<Module> data});
+  $Res call({List<ModuleProposalLink> data});
 }
 
 /// @nodoc
@@ -231,7 +231,7 @@ class __$RenderCopyWithImpl<$Res> extends _$RenderStateCopyWithImpl<$Res>
       data == freezed
           ? _value.data
           : data // ignore: cast_nullable_to_non_nullable
-              as List<Module>,
+              as List<ModuleProposalLink>,
     ));
   }
 }
@@ -242,7 +242,7 @@ class _$_Render implements _Render {
   const _$_Render(this.data);
 
   @override
-  final List<Module> data;
+  final List<ModuleProposalLink> data;
 
   @override
   String toString() {
@@ -270,7 +270,7 @@ class _$_Render implements _Render {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
-    required TResult Function(List<Module> data) render,
+    required TResult Function(List<ModuleProposalLink> data) render,
     required TResult Function() error,
   }) {
     return render(data);
@@ -280,7 +280,7 @@ class _$_Render implements _Render {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? loading,
-    TResult Function(List<Module> data)? render,
+    TResult Function(List<ModuleProposalLink> data)? render,
     TResult Function()? error,
   }) {
     return render?.call(data);
@@ -290,7 +290,7 @@ class _$_Render implements _Render {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
-    TResult Function(List<Module> data)? render,
+    TResult Function(List<ModuleProposalLink> data)? render,
     TResult Function()? error,
     required TResult orElse(),
   }) {
@@ -336,9 +336,9 @@ class _$_Render implements _Render {
 }
 
 abstract class _Render implements RenderState {
-  const factory _Render(List<Module> data) = _$_Render;
+  const factory _Render(List<ModuleProposalLink> data) = _$_Render;
 
-  List<Module> get data;
+  List<ModuleProposalLink> get data;
   @JsonKey(ignore: true)
   _$RenderCopyWith<_Render> get copyWith => throw _privateConstructorUsedError;
 }
@@ -382,7 +382,7 @@ class _$_Error implements _Error {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
-    required TResult Function(List<Module> data) render,
+    required TResult Function(List<ModuleProposalLink> data) render,
     required TResult Function() error,
   }) {
     return error();
@@ -392,7 +392,7 @@ class _$_Error implements _Error {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult Function()? loading,
-    TResult Function(List<Module> data)? render,
+    TResult Function(List<ModuleProposalLink> data)? render,
     TResult Function()? error,
   }) {
     return error?.call();
@@ -402,7 +402,7 @@ class _$_Error implements _Error {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
-    TResult Function(List<Module> data)? render,
+    TResult Function(List<ModuleProposalLink> data)? render,
     TResult Function()? error,
     required TResult orElse(),
   }) {

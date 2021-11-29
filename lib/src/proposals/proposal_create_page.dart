@@ -4,9 +4,11 @@ import 'package:daobao/services/proposals/proposals.dart';
 import 'package:daobao/src/proposals/create/create_proposal_bloc.dart';
 import 'package:daobao/src/proposals/proposal_components.dart';
 import 'package:daobao/src/router.dart';
+import 'package:fl_toast/fl_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:daobao/helpers/helpers.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_web3/flutter_web3.dart';
 import 'package:iconly/iconly.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:markdown_widget/markdown_widget.dart';
@@ -42,7 +44,10 @@ class _ProposalCreatePageState extends State<ProposalCreatePage> {
   }
 
   void onSubmit() {
-    if (!canSubmit) return;
+    if (!canSubmit) {
+      showTextToast(text: 'Please fill in the fields.', context: context);
+      return;
+    }
     if (isBackgroundImage) {
     } else {
       bloc.add(AddComb(titleController.text, summaryController.text,
@@ -127,8 +132,17 @@ class _ProposalCreatePageState extends State<ProposalCreatePage> {
                   BlocConsumer<CreateProposalBloc, CreateProposalState>(
                     listener: (context, state) {
                       state.whenOrNull(
-                          success: () =>
-                              context.router.push(const ProposalHistoryRoute()));
+                        success: () =>
+                            context.router.push(const ProposalHistoryRoute()),
+                        error: (e) {
+                          if (e is EthereumException) {
+                            showTextToast(
+                                text:
+                                    '${e.toString()}. Please make sure that you\'re a member. Only three proposals may be active at once.',
+                                context: context);
+                          }
+                        },
+                      );
                     },
                     builder: (context, state) {
                       return state.maybeWhen(loading: () {
@@ -350,7 +364,8 @@ class _ContentCombEditorState extends State<ContentCombEditor> {
                         onChanged: (_) => setState(() {}),
                         cursorWidth: 1,
                         decoration: const InputDecoration(
-                          hintText: '''
+                          hintText:
+                              '''
 ## HomepageDAO
 Insert some random content here
 
@@ -415,7 +430,8 @@ You can also add images and videos!
               onChanged: (_) => setState(() {}),
               cursorWidth: 1,
               decoration: const InputDecoration(
-                hintText: '''
+                hintText:
+                    '''
 ## Summary
 Insert your summary here
 ## Why it should be added?

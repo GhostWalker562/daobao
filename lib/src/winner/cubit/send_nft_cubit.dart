@@ -20,7 +20,6 @@ class SendNftCubit extends Cubit<SendNftState> {
     emit(const SendNftState.loading());
     try {
       final sp = await SharedPreferences.getInstance();
-      await sp.clear();
       final sent = sp.getString('sent-nft');
       final hash = sp.getString('sent-nft-hash');
       if (sent != null && sent == addy && hash != null) {
@@ -44,11 +43,7 @@ class SendNftCubit extends Cubit<SendNftState> {
       final res = await Dio().post(
         'https://api.nftport.xyz/v0/mints/easy/urls',
         options: Options(
-          headers: {
-            HttpHeaders.authorizationHeader: (kIsWeb)
-                ? dotenv.get('NFTPORT')
-                : const String.fromEnvironment('NFTPORT')
-          },
+          headers: {HttpHeaders.authorizationHeader: dotenv.get('NFTPORT')},
           contentType: Headers.jsonContentType,
         ),
         data: {
@@ -61,8 +56,8 @@ class SendNftCubit extends Cubit<SendNftState> {
         },
       );
       final sp = await SharedPreferences.getInstance();
-      sp.setString('sent-nft', addy);
-      sp.setString('sent-nft-hash', res.data['transaction_hash'] as String);
+      await sp.setString('sent-nft', addy);
+      await sp.setString('sent-nft-hash', res.data['transaction_hash'] as String);
       emit(SendNftState.success(res.data['transaction_hash'] as String));
     } catch (e) {
       emit(const SendNftState.idle());

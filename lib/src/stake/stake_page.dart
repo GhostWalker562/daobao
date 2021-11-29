@@ -7,8 +7,11 @@ import 'package:daobao/shared/auth/auth_bloc.dart';
 import 'package:daobao/shared/auth/auth_guard.dart';
 import 'package:daobao/src/injectable.dart';
 import 'package:daobao/src/proposals/proposal_components.dart';
+import 'package:daobao/src/stake/cubit/balances_cubit.dart';
+import 'package:fl_toast/fl_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_web3/flutter_web3.dart';
 import 'package:lottie/lottie.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,6 +24,7 @@ class StakePage extends StatefulWidget {
 }
 
 class _StakePageState extends State<StakePage> {
+  final balances = BalancesCubit()..getBalances();
   // final controller = MaskedTextController(mask: '00.000000000000000000');
   bool staking = true;
 
@@ -134,10 +138,24 @@ class _StakePageState extends State<StakePage> {
                                   (!snapshot.data! && staking)) {
                                 return TransparentButton(
                                   onPressed: () async {
-                                    await (await getIt<Web3Service>().sendDao(
-                                            staking ? 'stake' : 'withdraw'))
-                                        .wait();
-                                    context.router.pushNamed('stake');
+                                    try {
+                                      await (await getIt<Web3Service>().sendDao(
+                                              staking ? 'stake' : 'withdraw'))
+                                          .wait();
+                                      context.router.pushNamed('stake');
+                                    } on EthereumException catch (e) {
+                                      if (balances.state.wmatic < 0.2) {
+                                        showTextToast(
+                                            text: 'Not enough WMATIC',
+                                            context: context);
+                                        return;
+                                      }
+                                      showTextToast(
+                                          text: e.message, context: context);
+                                    } catch (e) {
+                                      showTextToast(
+                                          text: e.toString(), context: context);
+                                    }
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(
@@ -167,12 +185,17 @@ class _StakePageState extends State<StakePage> {
 
                         return TransparentButton(
                           onPressed: () async {
-                            await (await getIt<Web3Service>().approve(
-                              staking ? kWMATIC : kDaobao,
-                              kDao,
-                            ))
-                                .wait();
-                            context.router.pushNamed('stake');
+                            try {
+                              await (await getIt<Web3Service>().approve(
+                                staking ? kWMATIC : kDaobao,
+                                kDao,
+                              ))
+                                  .wait();
+                              context.router.pushNamed('stake');
+                            } catch (e) {
+                              showTextToast(
+                                  text: e.toString(), context: context);
+                            }
                           },
                           child: Container(
                             decoration: BoxDecoration(
@@ -195,51 +218,52 @@ class _StakePageState extends State<StakePage> {
                       },
                     ),
                   ],
+                  const SizedBox(height: 12),
+                  Text('Balances', style: context.textTheme.headline4),
+                  const SizedBox(height: 12),
+                  if (context.watch<AuthBloc>().state is Connected)
+                    BlocProvider.value(
+                      value: balances..getBalances(),
+                      child: BlocBuilder<BalancesCubit, BalancesState>(
+                        builder: (context, state) {
+                          return state.when(
+                            loading: (_, __) =>
+                                const CircularProgressIndicator(),
+                            balances: (daob, wmatic) => Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    SelectableText(
+                                      'WMATIC',
+                                      style: context.textTheme.subtitle1,
+                                    ),
+                                    const Spacer(),
+                                    SelectableText(wmatic.toString()),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  children: [
+                                    SelectableText(
+                                      'DAOB',
+                                      style: context.textTheme.subtitle1,
+                                    ),
+                                    const Spacer(),
+                                    SelectableText(daob.toString()),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    )
                 ],
               ),
             ),
           ),
         ),
       ),
-      //  Container(
-      //       background: context.colorScheme.secondary
-      //       child: Column(
-      //         mainAxisSize: MainAxisSize.min,
-      //         children: [
-      //           ElevatedButton(
-      //             onPressed: () async => print(await getIt<Web3Service>()
-      //                 .viewDao<List<dynamic>>('getLiveProposals')),
-      //             child: Text('View live'),
-      //           ),
-      //           ElevatedButton(
-      //             onPressed: () async =>
-      //                 print((await getIt<Web3Service>().approve(
-      //               '0x86652c1301843B4E06fBfbBDaA6849266fb2b5e7'.toLowerCase(),
-      //               '0xb30cDc96e5eD10eAF8f13f0879C6d3D60b5d9D7D'.toLowerCase(),
-      //             ))
-      //                     .wait()),
-      //             child: Text('Approve live'),
-      //           ),
-      //           ElevatedButton(
-      //             onPressed: () async => print(
-      //                 await (await getIt<Web3Service>().sendDao<List<dynamic>>(
-      //               'stake',
-      //             ))
-      //                     .hash),
-      //             child: Text('Stake live'),
-      //           ),
-      //           ElevatedButton(
-      //             onPressed: () async {
-      //               print((await getIt<Web3Service>().viewDao<bool>(
-      //                 'getMembers',
-      //                 [(context.read<AuthBloc>().state as Connected).address],
-      //               )));
-      //             },
-      //             child: Text('Is member'),
-      //           ),
-      //         ],
-      //       ),
-      //     ),
     );
   }
 }

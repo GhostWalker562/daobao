@@ -22,7 +22,7 @@ class ProposalsDetailsPage extends StatefulWidget {
     @PathParam('id') required this.id,
   }) : super(key: key);
 
-  final int id;
+  final String id;
 
   @override
   State<ProposalsDetailsPage> createState() => _ProposalsDetailsPageState();

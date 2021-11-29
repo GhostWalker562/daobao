@@ -55,7 +55,7 @@ class CreateProposalBloc
       emit(const _Success());
     } catch (e) {
       print(e);
-      emit(const _Error());
+      emit(_Error(e));
       emit(const _Unloaded());
     }
   }

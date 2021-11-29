@@ -41,6 +41,13 @@ class Module with _$Module {
   factory Module.fromJson(Map<String, dynamic> json) => _$ModuleFromJson(json);
 }
 
+class ModuleProposalLink {
+  final Module module;
+  final Proposal proposal;
+
+  const ModuleProposalLink(this.module, this.proposal);
+}
+
 class ProposalTypeConverter implements JsonConverter<ProposalType, int> {
   const ProposalTypeConverter();
 

@@ -3,8 +3,8 @@ const String kMumbaiAlchemy =
 
 const List<int> supportedChains = [80001];
 
-const String kDao = '0x49F371DaB13414437A31388430DC47fcE9C56dfc';
-const String kDaobao = '0x6486aE4a9aBD4c3f638569212c0D1E1899Cebc8D';
+const String kDao = '0x0ED398EAd912F2369876e1BDc6DeAB3C559351bA';
+const String kDaobao = '0x04bDF4aCd5aa2bb3d5d6D34C1E023fB7811CD7FB';
 const String kWMATIC = '0x86652c1301843B4E06fBfbBDaA6849266fb2b5e7';
 
 String getAlchemyLink(int chainId) {

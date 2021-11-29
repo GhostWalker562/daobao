@@ -3,6 +3,7 @@ import 'package:daobao/helpers/extensions.dart';
 import 'package:daobao/helpers/helpers.dart';
 import 'package:daobao/services/proposals/proposals_service.dart';
 import 'package:daobao/src/home/cubit/render_cubit.dart';
+import 'package:daobao/src/router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:markdown_widget/markdown_widget.dart';
@@ -53,45 +54,13 @@ class HomePage extends StatelessWidget {
                             itemBuilder: (context, index) {
                               if (index == data.length) {
                                 return const SizedBox(height: 300);
-                                return Center(
-                                  child: Container(
-                                    padding: const EdgeInsets.all(12),
-                                    margin: const EdgeInsets.only(
-                                        top: 32, bottom: 12),
-                                    decoration: BoxDecoration(
-                                      borderRadius: Radii.mr,
-                                      border: Border.all(
-                                          color: context.colorScheme.primary,
-                                          width: 1),
-                                      color: context.colorScheme.primaryVariant,
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        SelectableText(
-                                          'The Homepage 🔥',
-                                          style: context.textTheme.headline6!
-                                              .copyWith(
-                                            fontWeight: FontWeight.bold,
-                                            color: context.colorScheme.primary,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        const SelectableText(
-                                          'All content shown on this page is generated from the DAO.',
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
                               }
 
                               return Center(
                                 child: Container(
                                   constraints:
                                       const BoxConstraints(maxWidth: 850),
-                                  child: MarkdownRender(module: data[index]),
+                                  child: MarkdownRender(link: data[index]),
                                 ),
                               );
                             },
@@ -137,36 +106,37 @@ class HomePage extends StatelessWidget {
               ),
             )
           else
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                margin: const EdgeInsets.all(32),
-                decoration: BoxDecoration(
-                  borderRadius: Radii.mr,
-                  border:
-                      Border.all(color: context.colorScheme.primary, width: 1),
-                  color: context.colorScheme.primaryVariant,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SelectableText(
-                      'The Homepage 🔥',
-                      style: context.textTheme.headline6!.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: context.colorScheme.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const SelectableText(
-                      'All content shown on this page is generated from the DAO. HomepageDAO fosters the new generation of DAOs, expanding away from protocol and into user generated content.',
-                    ),
-                  ],
-                ),
-              ),
-            )
+            const SizedBox.shrink()
+          // Align(
+          //   alignment: Alignment.bottomCenter,
+          //   child: Container(
+          //     padding: const EdgeInsets.all(12),
+          //     margin: const EdgeInsets.all(32),
+          //     decoration: BoxDecoration(
+          //       borderRadius: Radii.mr,
+          //       border:
+          //           Border.all(color: context.colorScheme.primary, width: 1),
+          //       color: context.colorScheme.primaryVariant,
+          //     ),
+          //     child: Column(
+          //       mainAxisSize: MainAxisSize.min,
+          //       crossAxisAlignment: CrossAxisAlignment.start,
+          //       children: [
+          //         SelectableText(
+          //           'The Homepage 🔥',
+          //           style: context.textTheme.headline6!.copyWith(
+          //             fontWeight: FontWeight.bold,
+          //             color: context.colorScheme.primary,
+          //           ),
+          //         ),
+          //         const SizedBox(height: 8),
+          //         const SelectableText(
+          //           'All content shown on this page is generated from the DAO. HomepageDAO fosters the new generation of DAOs, expanding away from protocol and into user generated content.',
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // )
         ],
       ),
     );
@@ -174,9 +144,9 @@ class HomePage extends StatelessWidget {
 }
 
 class MarkdownRender extends StatelessWidget {
-  const MarkdownRender({Key? key, required this.module}) : super(key: key);
+  const MarkdownRender({Key? key, required this.link}) : super(key: key);
 
-  final Module module;
+  final ModuleProposalLink link;
 
   @override
   Widget build(BuildContext context) {
@@ -188,12 +158,19 @@ class MarkdownRender extends StatelessWidget {
         children: [
           Align(
               alignment: Alignment.topRight,
-              child: Text('Proposal: ${module.title}',
-                  style: context.textTheme.overline)),
-          module.maybeWhen(
+              child: TransparentButton(
+                onPressed: () => context.router
+                    .push(ProposalsDetailsRoute(id: link.proposal.id)),
+                child: Text('Proposal: ${link.proposal.id}',
+                    style: context.textTheme.overline),
+              )),
+          link.module.maybeWhen(
             (title, summary) => const SizedBox.shrink(),
-            comb: (title, summary, cid) =>
-                MarkdownWidget(data: cid, shrinkWrap: true),
+            comb: (title, summary, cid) => MarkdownWidget(
+              data: cid,
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+            ),
             orElse: () => const SizedBox.shrink(),
           ),
         ],

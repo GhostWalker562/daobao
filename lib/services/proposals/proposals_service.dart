@@ -120,19 +120,20 @@ class ProposalsService {
     return proposals;
   }
 
-  Future<List<proposals.Module>> getLiveProposalsModuleData() async {
+  Future<List<proposals.ModuleProposalLink>>
+      getLiveProposalsModuleData() async {
     // FutureBuilder<Response<Map<String, dynamic>>>(
     //                           future: Dio().get<Map<String, dynamic>>(
     //                               'https://ipfs.moralis.io:2053/ipfs/${proposal.cid}'),
 
-    final List<proposals.Module> modules = [];
+    final List<proposals.ModuleProposalLink> modules = [];
     final props = await getLiveProposals();
     for (Proposal prop in props) {
       try {
         final res = await Dio().get<Map<String, dynamic>>(
             'https://ipfs.moralis.io:2053/ipfs/${prop.cid}');
         final module = proposals.Module.fromJson(res.data!);
-        modules.add(module);
+        modules.add(ModuleProposalLink(module, prop));
       } catch (e) {
         print(e);
         continue;

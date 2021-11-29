@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:daobao/services/constants.dart';
 import 'package:daobao/services/moralis/moralis.dart';
 import 'package:daobao/services/web3/web3.dart';
 import 'package:daobao/src/injectable.dart';
@@ -21,6 +22,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<Connect>(connect);
     on<Clear>(clear);
   }
+
+  bool get isConnected => state is Connected;
+  bool get wrongChain =>
+      state is Connected &&
+      !supportedChains.contains((state as Connected).chainId);
 
   Future<void> connect(Connect event, Emitter<AuthState> emit) async {
     if (!web3Service.isSupported) return emit(const AuthState.unsupported());

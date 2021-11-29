@@ -56,7 +56,8 @@ class _$AppRouter extends RootStackRouter {
     ProposalsDetailsRoute.name: (routeData) {
       final pathParams = routeData.inheritedPathParams;
       final args = routeData.argsAs<ProposalsDetailsRouteArgs>(
-          orElse: () => ProposalsDetailsRouteArgs(id: pathParams.getInt('id')));
+          orElse: () =>
+              ProposalsDetailsRouteArgs(id: pathParams.getString('id')));
       return CustomPage<dynamic>(
           routeData: routeData,
           child: ProposalsDetailsPage(key: args.key, id: args.id),
@@ -175,7 +176,7 @@ class ProposalCreateRoute extends PageRouteInfo<void> {
 
 /// generated route for [ProposalsDetailsPage]
 class ProposalsDetailsRoute extends PageRouteInfo<ProposalsDetailsRouteArgs> {
-  ProposalsDetailsRoute({Key? key, required int id})
+  ProposalsDetailsRoute({Key? key, required String id})
       : super(name,
             path: 'proposals/:id',
             args: ProposalsDetailsRouteArgs(key: key, id: id),
@@ -189,7 +190,7 @@ class ProposalsDetailsRouteArgs {
 
   final Key? key;
 
-  final int id;
+  final String id;
 
   @override
   String toString() {
